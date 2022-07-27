@@ -25,7 +25,7 @@ namespace OutlookScanService.Logic
 
             pipeServerThread = new Thread(PipeServerThread);
             pipeServerThread.Start();
-            //return;
+
             Logger.WriteToFile("Service is started at " + DateTime.Now);
         }
 
@@ -64,10 +64,10 @@ namespace OutlookScanService.Logic
                 new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null), PipeAccessRights.ReadWrite,
                 System.Security.AccessControl.AccessControlType.Allow));
 
-            // serverStream = new NamedPipeServerStream("PipesEnroll", PipeDirection.InOut, 1);
             serverStream = new NamedPipeServerStream("PipesEnroll", PipeDirection.InOut, 1, PipeTransmissionMode.Byte,
                 PipeOptions.Asynchronous, 0, 0, pipeSecurity);
             streamString = new StreamString(serverStream);
+            
             while (true)
             {
                 try
@@ -94,19 +94,16 @@ namespace OutlookScanService.Logic
                     }
 
                     serverStream.Disconnect();
-                    Console.WriteLine(1);
                 }
                 catch (Exception e)
                 {
-                    // ignored
-                    Console.WriteLine(1);
+                    Logger.WriteToFile($"An error occurred while listening to requests from pipe. Pipe is not connected. Exception: {e}");
                 }
             }
         }
 
         public void OnStop()
         {
-            //return;
             Logger.WriteToFile("Service is stopped at " + DateTime.Now);
         }
     }
